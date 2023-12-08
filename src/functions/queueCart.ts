@@ -1,17 +1,21 @@
 import { app, InvocationContext,output } from "@azure/functions";
 
-export async function queueCart(queueItem: unknown, context: InvocationContext): Promise<{mensaje: unknown}> {
+export async function queueCart(queueItem: string, context: InvocationContext): Promise<unknown> {
     context.log('Storage queue function processed work item:', queueItem);
-    return ({mensaje:queueItem})
+    context.log('Queue name:', context.info);
+    return (queueItem )
 }
+
+
 
 app.storageQueue('queueCart', {
     queueName: 'ordersqueue105858896',
     connection: 'AzureWebJobsStorage',
     return: output.cosmosDB({
-        databaseName: 'orders',
-        collectionName: 'mycontainer',
-        createIfNotExists: true,
+        databaseName: 'webCartDB',
+        collectionName: 'customer', 
+        partitionKey: '/storeId',        
+        createIfNotExists: true,       
         connectionStringSetting: 'CosmosDBconnectionString'
     }),
     handler: queueCart
